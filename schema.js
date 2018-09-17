@@ -1,28 +1,25 @@
 var graphql = require('graphql');
 
-var TODOs = [{
-        "id": 1446412739542,
-        "title": "Read emails",
-        "completed": false
-    },
-    {
-        "id": 1446412740883,
-        "title": "Buy orange",
-        "completed": true
-    }
-];
-
 var TodoType = new graphql.GraphQLObjectType({
-    name: 'todo',
+    name: 'comm',
     fields: function () {
         return {
             id: {
                 type: graphql.GraphQLID
             },
+            from: {
+                type: graphql.GraphQLString
+            },
             title: {
                 type: graphql.GraphQLString
             },
-            completed: {
+            body: {
+                type: graphql.GraphQLString
+            },
+            sent: {
+                type: graphql.GraphQLString
+            },
+            read: {
                 type: graphql.GraphQLBoolean
             }
         }
@@ -33,14 +30,28 @@ var queryType = new graphql.GraphQLObjectType({
     name: 'Query',
     fields: function () {
         return {
-            todos: {
+            comms: {
                 type: new graphql.GraphQLList(TodoType),
-                resolve: function () {
-                    return new Promise(function (resolve, reject) {
-                        setTimeout(function () {
-                            resolve(TODOs)
-                        }, 0)
-                    });
+                args: {
+                    id: {
+                        type: graphql.GraphQLID
+                    },
+                },
+                resolve: function (value, {
+                    id
+                }) {
+                    var communications = require('./data.json')
+
+                    if (id) {
+                        return new Promise(function (resolve, reject) {
+                            // this doesnt work! of course it doesnt
+                            resolve(communications.filter((item) => item.id === id));
+                        });
+                    } else {
+                        return new Promise(function (resolve, reject) {
+                            resolve(communications);
+                        });
+                    }
                 }
             }
         }
@@ -61,12 +72,16 @@ var mutation = new graphql.GraphQLObjectType({
                         type: graphql.GraphQLBoolean
                     }
                 },
-                resolve: function (value, {title, completed }) {
+                resolve: function (value, {
+                    title,
+                    completed
+                }) {
                     var item = {
-                        title, completed
+                        title,
+                        completed
                     }
-                    
-                    TODOs.push(item);
+
+                    communications.push(item);
                     return item;
                 }
             }

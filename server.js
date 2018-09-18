@@ -9,5 +9,5 @@ var app = express()
     graphiql: true,
   }))
   .listen(8090, function (err) {
-    console.log('GraphQL Server is now running on localhost:8080');
+    console.log('GraphQL Server is now running on localhost:8090');
   });

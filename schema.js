@@ -1,4 +1,5 @@
 var graphql = require('graphql');
+var communications = require('./data.json')
 
 var TodoType = new graphql.GraphQLObjectType({
     name: 'comm',
@@ -40,16 +41,36 @@ var queryType = new graphql.GraphQLObjectType({
                 resolve: function (value, {
                     id
                 }) {
-                    var communications = require('./data.json')
-
                     if (id) {
                         return new Promise(function (resolve, reject) {
                             // this doesnt work! of course it doesnt
-                            resolve(communications.filter((item) => item.id === id));
+                            resolve(communications.filter((item) => item.id == id));
                         });
                     } else {
                         return new Promise(function (resolve, reject) {
                             resolve(communications);
+                        });
+                    }
+                }
+            },
+            comm: {
+                type: TodoType,
+                args: {
+                    id: {
+                        type: graphql.GraphQLID
+                    },
+                },
+                resolve: function (value, {
+                    id
+                }) {
+                    if (id) {
+                        return new Promise(function (resolve, reject) {
+                            // this doesnt work! of course it doesnt
+                            resolve(communications.filter((item) => item.id == id))[0];
+                        });
+                    } else {
+                        return new Promise(function (resolve, reject) {
+                            resolve(communications[0]);
                         });
                     }
                 }
